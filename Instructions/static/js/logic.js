@@ -1,3 +1,4 @@
+//USGS earthquake data
 var queryUrl = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson"
 
 
@@ -7,60 +8,57 @@ d3.json(queryUrl).then(function(data){
 
 function createFeatures(earthquakeData) {
 
-// Define a function that we want to run once for each feature in the features array.
-// Give each feature a popup that describes the place and time of the earthquake.
+// Defining a function that runs once for each feature in the features array.
+// Giving each feature a popup that describes the place and time of the earthquake.
     function onEachFeature(feature, layer) {
         layer.bindPopup(`<h3>Location: ${feature.properties.place}</h3><hr><p> Time: ${new Date(feature.properties.time)}</p> <br><h2> Magnitude: ${feature.properties.mag}</h2>`); 
         }     
         
    
 
-    function geojsonMarkerOptions (feature, latlng) {
-        let options = {
+    function createMarker (feature, latlng) {
+        let options={
             radius: feature.properties.mag*5,
             fillColor: markerColor(feature.geometry.coordinates[2]),
             color: markerColor(feature.geometry.coordinates[2]),
             weight: 1,
             opacity: 1,
-            fillOpacity: 0.5
-      }
-        return L.geojsonMarkerOptions(latlng, options);
+            fillOpacity: 0.5,
+        }
+        return L.circleMarker(latlng, options)
     }
 
-// Create a GeoJSON layer that contains the features array on the earthquakeData object.
-// Run the onEachFeature function once for each piece of data in the array.
+        
+    
+
+// Creating a GeoJSON layer that contains the features array on the earthquakeData object.
+// Running the onEachFeature function once for each piece of data in the array.
     var earthquakes = L.geoJSON(earthquakeData, {
         onEachFeature: onEachFeature,
-        pointToLayer: geojsonMarkerOptions
+        pointToLayer: createMarker
         
     });
-
 // Send our earthquakes layer to the createMap function/
     createMap(earthquakes);
 }
 
-
-var depth = feature.geometry.coordinates[2]
-// define color gradients based on depth
 function markerColor(depth){
-    for(var i=0; i< data.features.length; i++){
-        var color = "";
+    
+    
     if (depth > 20) {
-        color = "red";
+        return "red";
     }
     else if (depth > 10) {
-        color = "orange";
+        return "orange";
     }
-    else if (depth > 5) {
-        color = "yellow";
+    else if (depth > 2) {
+        return "yellow";
     }
     else {
-        color = "green";
+        return "green";
     }
 
-    }
 }
-
 
 function createMap(earthquakes) {
 
