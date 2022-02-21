@@ -21,9 +21,9 @@ function createFeatures(earthquakeData) {
             radius: feature.properties.mag*5,
             fillColor: markerColor(feature.geometry.coordinates[2]),
             color: markerColor(feature.geometry.coordinates[2]),
-            weight: 1,
+            weight: 2,
             opacity: 1,
-            fillOpacity: 0.5,
+            fillOpacity: 0.8,
         }
         return L.circleMarker(latlng, options)
     }
@@ -60,6 +60,26 @@ function markerColor(depth){
 
 }
 
+//Adding a legend to the map
+let legend = L.control({position: 'bottomright'});
+
+legend.onAdd = function (map) {
+
+    let div = L.DomUtil.create('div', 'info legend'),
+    grades = [0, 2, 10, 20],
+    labels = [];
+
+// loop through density intervals and generate a label with a colored square for each interval
+    for (i = 0; i < grades.length; i++) {
+        div.innerHTML +=
+            '<i style="background:' + markerColor(grades[i] + 1) + '"></i> ' +
+            grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+    }
+    return div;
+};
+
+
+
 function createMap(earthquakes) {
 
     // Create the base layers.
@@ -86,6 +106,7 @@ function createMap(earthquakes) {
     // Create an overlay object to hold our overlay.
     var overlayMaps = {
       Earthquakes: earthquakes
+      
     };
   
     // Create our map, giving it the streetmap and earthquakes layers to display on load.
@@ -97,6 +118,7 @@ function createMap(earthquakes) {
       layers: [street, earthquakes]
     });
 
+    
     L.control.layers(baseMaps, overlayMaps, {
         collapsed: false
       }).addTo(myMap);
